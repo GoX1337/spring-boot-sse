@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SSE demo</title>
+</head>
+<body>
+    <h1>Server-sent event demo</h1>
+    <ul id="list"></ul>
+
+    <script type="text/javascript">
+
+        var eventSource = new EventSource('/events');
+        
+        eventSource.onmessage = function (event) {
+            let eventJson = JSON.parse(event.data);
+            console.log("eventJson", eventJson);
+            if(Array.isArray(eventJson)){
+                eventJson.forEach(e => {
+                    const newElement = document.createElement("li");
+                    const eventList = document.getElementById("list");
+                    newElement.innerHTML = "event: " + e.payload;
+                    eventList.appendChild(newElement);
+                });
+            } else {
+                const newElement = document.createElement("li");
+                const eventList = document.getElementById("list");
+                newElement.innerHTML = "event: " + eventJson.payload;
+                eventList.appendChild(newElement);
+            } 
+        };
+
+        eventSource.onopen = function () {
+           console.log('connection is established');
+        };
+
+        eventSource.onerror = function (error) {
+           console.log('connection state: ' + eventSource.readyState);
+           console.log('error', error);
+        };
+
+    </script>
+</body>
+</html>
